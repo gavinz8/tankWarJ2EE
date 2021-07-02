@@ -1,0 +1,4 @@
+initTankCount=5
+windowWidth=800
+windowHeight=600
+tankFireStrategy=DefaultFireStrategy
