@@ -1,6 +1,10 @@
 package xyz.gavinz;
 
 
+import xyz.gavinz.chainofresponsibility.BulletTankCollider;
+import xyz.gavinz.chainofresponsibility.BulletWallCollider;
+import xyz.gavinz.chainofresponsibility.Collider;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -26,6 +30,7 @@ public class TankFrame extends Frame {
     private Player myTank;
     private Image offScreenImage;
     private List<AbstractGameObject> objects;
+    private List<Collider> colliders;
 
     private TankFrame() {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -48,6 +53,10 @@ public class TankFrame extends Frame {
 
     private void initObjects() {
         myTank = new Player(200, 200, Direction.DOWN);
+        this.colliders = new ArrayList<>();
+        this.colliders.add(new BulletTankCollider());
+        this.colliders.add(new BulletWallCollider());
+
         this.objects = new ArrayList<>();
         objects.add(new Wall(20, 50, 200, 30));
         for (int i = 0; i < PropertyMgr.getInteger("initTankCount"); i++) {
@@ -59,8 +68,21 @@ public class TankFrame extends Frame {
     public void paint(Graphics g) {
         myTank.paint(g);
 
+
+        // 碰撞检测
         for (int i = 0; i < objects.size(); i++) {
-            objects.get(i).paint(g);
+            for (int j = 0; j < objects.size(); j++) {
+                for (Collider collider : colliders) {
+                    collider.collide(objects.get(i), objects.get(j));
+                }
+            }
+
+
+            if (objects.get(i).isLive()) {
+                objects.get(i).paint(g);
+            } else {
+                objects.remove(i);
+            }
         }
 
         /*
@@ -101,7 +123,7 @@ public class TankFrame extends Frame {
         Graphics gOffScreen = offScreenImage.getGraphics();
         Color c = gOffScreen.getColor();
         gOffScreen.setColor(Color.BLACK);
-        gOffScreen.fillRect(0, 0, WINDOW_WIDTH, WINDOW_WIDTH);
+        gOffScreen.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         gOffScreen.setColor(c);
         paint(gOffScreen);
         g.drawImage(offScreenImage, 0, 0, null);

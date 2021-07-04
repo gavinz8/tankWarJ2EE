@@ -8,8 +8,22 @@ import java.awt.*;
  * @author Gavin.Zhao
  */
 public abstract class AbstractGameObject {
-    public static final int HEIGHT = 0;
     protected int x, y, width, height;
+    protected Rectangle rectangle;
+    protected boolean live = true;
+
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public boolean isLive() {
+        return live;
+    }
+
+    public void setLive(boolean live) {
+        this.live = live;
+    }
 
     public abstract void paint(Graphics g);
+
 }

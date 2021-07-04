@@ -13,7 +13,6 @@ public class Player extends AbstractGameObject {
     private Direction direction;
     private boolean bL, bR, bU, bD;
     private boolean moving;
-    private boolean live = true;
     private Group group = Group.GOOD;
     private FireStrategy fireStrategy;
 
@@ -43,14 +42,6 @@ public class Player extends AbstractGameObject {
 
     public Direction getDirection() {
         return direction;
-    }
-
-    public boolean isLive() {
-        return live;
-    }
-
-    public void setLive(boolean live) {
-        this.live = live;
     }
 
     public void setY(int y) {
@@ -158,7 +149,7 @@ public class Player extends AbstractGameObject {
             if (bL && !bR && !bD && !bU) direction = Direction.LEFT;
             if (!bL && bR && !bD && !bU) direction = Direction.RIGHT;
             if (!bL && !bR && bD && !bU) direction = Direction.DOWN;
-            if (!bL && !bR && !bD && bU) direction = Direction.UP;
+            if (!bL && !bR && !bD) direction = Direction.UP;
         }
     }
 
@@ -167,11 +158,7 @@ public class Player extends AbstractGameObject {
         try {
             fireStrategy = (FireStrategy) Class.forName(packageName + PropertyMgr.get("tankFireStrategy"))
                     .newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

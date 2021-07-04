@@ -14,6 +14,8 @@ public class Wall extends AbstractGameObject {
         this.y = y;
         this.width = width;
         this.height = height;
+
+        this.rectangle = new Rectangle(x, y, width, height);
     }
 
     @Override

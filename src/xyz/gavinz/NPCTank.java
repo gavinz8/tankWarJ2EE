@@ -9,9 +9,8 @@ import java.util.Random;
 public class NPCTank extends AbstractGameObject {
     public static final int SPEED = 5;
     private Direction direction;
-    private boolean moving = true;
-    private boolean live = true;
-    private Group group = Group.BAD;
+    private final boolean moving = true;
+    private final Group group = Group.BAD;
     private int oldX, oldY;
 
     public NPCTank(int x, int y, Direction direction) {
@@ -21,6 +20,8 @@ public class NPCTank extends AbstractGameObject {
 
         oldX = x;
         oldY = y;
+
+        rectangle = new Rectangle(x, y, ResourceMgr.badTankD.getWidth(), ResourceMgr.badTankD.getHeight());
     }
 
     public int getX() {
@@ -35,14 +36,6 @@ public class NPCTank extends AbstractGameObject {
         return y;
     }
 
-    public boolean isLive() {
-        return live;
-    }
-
-    public void setLive(boolean live) {
-        this.live = live;
-    }
-
     public void setY(int y) {
         this.y = y;
     }
@@ -52,11 +45,10 @@ public class NPCTank extends AbstractGameObject {
     }
 
     public void die() {
-        this.live = false;
-        TankFrame.INSTANCE.add(new Explode(x + this.getWidth() / 2 - Explode.WIDTH / 2, y + this.getHeight() / 2 - Explode.HEIGHT / 2));
+        this.setLive(false);
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     private void randomDir() {
         if (random.nextInt(100) > 95)
@@ -109,6 +101,9 @@ public class NPCTank extends AbstractGameObject {
                 break;
         }
 
+        rectangle.x = x;
+        rectangle.y = y;
+
         boundsCheck();
 
         randomDir();
@@ -127,8 +122,8 @@ public class NPCTank extends AbstractGameObject {
     private void boundsCheck() {
         // 出界
         if (x < 0 || y < 30
-                || x > (TankFrame.INSTANCE.WINDOW_WIDTH - this.getWidth())
-                || y > (TankFrame.INSTANCE.WINDOW_HEIGHT - this.getHeight())) {
+                || x > (TankFrame.WINDOW_WIDTH - this.getWidth())
+                || y > (TankFrame.WINDOW_HEIGHT - this.getHeight())) {
             this.back();
         }
     }
