@@ -7,7 +7,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import xyz.gavinz.GameModel;
-import xyz.gavinz.NPCTank;
 
 /**
  * netty client
@@ -48,33 +47,23 @@ public class Client {
         }
     }
 
-    public void send(TankJoinMsg msg) {
-        channel.writeAndFlush(msg);
+    public void send(Message msg) {
+        if (channel != null) channel.writeAndFlush(msg);
     }
 
     public void close() {
         channel.close();
     }
 
-    class MyChannelInboundHandlerAdapter extends SimpleChannelInboundHandler<TankJoinMsg> {
+    class MyChannelInboundHandlerAdapter extends SimpleChannelInboundHandler<Message> {
         @Override
         public void channelActive(ChannelHandlerContext ctx) {
             ctx.writeAndFlush(new TankJoinMsg(GameModel.INSTANCE.getMyTank()));
         }
 
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, TankJoinMsg msg) {
-            if (msg.getId().equals(GameModel.INSTANCE.getMyTank().getId())) {
-                return;
-            }
-
-            if (GameModel.INSTANCE.findPlayerById(msg.getId()) != null) {
-                return;
-            }
-
-            System.out.println("other tank join..");
-            GameModel.INSTANCE.handle(msg);
-            ctx.writeAndFlush(new TankJoinMsg(GameModel.INSTANCE.getMyTank()));
+        protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
+           msg.handle();
         }
 
         @Override
@@ -84,7 +73,7 @@ public class Client {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            ctx.writeAndFlush(Unpooled.copiedBuffer("test".getBytes()));
+            cause.printStackTrace();
         }
     }
 

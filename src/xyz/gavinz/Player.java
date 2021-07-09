@@ -1,6 +1,8 @@
 package xyz.gavinz;
 
+import xyz.gavinz.net.Client;
 import xyz.gavinz.net.TankJoinMsg;
+import xyz.gavinz.net.TankMovingMsg;
 import xyz.gavinz.strategy.FireStrategy;
 
 import java.awt.*;
@@ -28,29 +30,12 @@ public class Player extends AbstractGameObject {
         this.initFireStrategy();
     }
 
-    public Player(TankJoinMsg msg) {
-        this.x = msg.getX();
-        this.y = msg.getY();
-         this.direction = msg.getDirection();
-         this.moving = msg.isMoving();
-         this.group = msg.getGroup();
-         this.id = msg.getId();
-    }
-
     public Group getGroup() {
         return group;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public Direction getDirection() {
@@ -165,17 +150,22 @@ public class Player extends AbstractGameObject {
             default:
                 break;
         }
+
+        Client.INSTANCE.send(new TankMovingMsg(this.id, x, y, direction, true));
     }
 
     private void setMainDir() {
-        if (!bL && !bR && !bD && !bU)
+        if (!bL && !bR && !bD && !bU) {
             moving = false;
-        else {
+            Client.INSTANCE.send(new TankMovingMsg(this.id, x, y, direction, false));
+        } else {
             moving = true;
             if (bL && !bR && !bD && !bU) direction = Direction.LEFT;
             if (!bL && bR && !bD && !bU) direction = Direction.RIGHT;
             if (!bL && !bR && bD && !bU) direction = Direction.DOWN;
             if (!bL && !bR && !bD) direction = Direction.UP;
+
+            Client.INSTANCE.send(new TankMovingMsg(this.id, x, y, direction, true));
         }
     }
 
@@ -191,7 +181,6 @@ public class Player extends AbstractGameObject {
 
     private void fire() {
         fireStrategy.fire(this);
-
     }
 
     public UUID getId() {

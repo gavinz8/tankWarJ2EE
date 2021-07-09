@@ -37,7 +37,7 @@ public class GameModel {
         this.objects = new ArrayList<>();
         objects.add(new Wall(20, 50, 200, 30));
         for (int i = 0; i < PropertyMgr.getInteger("initTankCount"); i++) {
-            objects.add(new NPCTank(50 + 50 * i, 50, Direction.DOWN));
+            objects.add(new NPCTank(UUID.randomUUID(),50 + 50 * i, 50, Direction.DOWN));
         }
     }
 
@@ -50,9 +50,9 @@ public class GameModel {
 
         // 碰撞检测
         for (int i = 0; i < objects.size(); i++) {
-            for (AbstractGameObject object : objects) {
+            for (int j = 0; j < objects.size(); j++) {
                 for (Collider collider : colliders) {
-                    collider.collide(objects.get(i), object);
+                    collider.collide(objects.get(i), objects.get(j));
                 }
             }
 
@@ -76,16 +76,11 @@ public class GameModel {
         myTank.keyReleased(e);
     }
 
-    public void handle(TankJoinMsg msg) {
-        this.add(new Player(msg));
-    }
 
-    public Player findPlayerById(UUID id) {
-        for (AbstractGameObject object : this.objects) {
-            if (object instanceof Player) {
-                if (((Player) object).getId().equals(id)) {
-                    return (Player) object;
-                }
+    public AbstractGameObject findObjectById(UUID id) {
+        synchronized (objects) {
+            for (AbstractGameObject object : objects) {
+                if (object.getId().equals(id)) return object;
             }
         }
 

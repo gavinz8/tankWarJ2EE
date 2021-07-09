@@ -6,17 +6,38 @@ import java.io.*;
 import java.util.UUID;
 
 /**
- * tank join message
+ * 子弹消息
  *
  * @author Gavin.Zhao
  */
-public class TankJoinMsg extends Message {
+public class BulletMsg extends Message {
+    private UUID id = UUID.randomUUID();
     private int x, y;
     private Direction direction;
-    private boolean moving;
+    private boolean live;
     private Group group;
+    private UUID playerId;
 
-    private UUID id;
+    public BulletMsg() {
+    }
+
+    public BulletMsg(Bullet bullet) {
+        this.x = bullet.getX();
+        this.y = bullet.getY();
+        this.id = bullet.getId();
+        this.direction = bullet.getDirection();
+        this.live = bullet.isLive();
+        this.group = Group.BAD;
+        this.playerId = bullet.getPlayerId();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public int getX() {
         return x;
@@ -42,12 +63,12 @@ public class TankJoinMsg extends Message {
         this.direction = direction;
     }
 
-    public boolean isMoving() {
-        return moving;
+    public boolean isLive() {
+        return live;
     }
 
-    public void setMoving(boolean moving) {
-        this.moving = moving;
+    public void setLive(boolean live) {
+        this.live = live;
     }
 
     public Group getGroup() {
@@ -58,26 +79,7 @@ public class TankJoinMsg extends Message {
         this.group = group;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public TankJoinMsg() {
-    }
-
-    public TankJoinMsg(Player t) {
-        this.x = t.getX();
-        this.y = t.getY();
-        this.direction = t.getDirection();
-        this.moving = t.isMoving();
-        this.group = t.getGroup();
-        this.id = t.getId();
-    }
-
+    @Override
     public byte[] toBytes() {
         byte[] bytes = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -86,10 +88,15 @@ public class TankJoinMsg extends Message {
             dos.writeInt(x);
             dos.writeInt(y);
             dos.writeInt(direction.ordinal());
-            dos.writeBoolean(moving);
             dos.writeInt(group.ordinal());
+            dos.writeBoolean(live);
+
             dos.writeLong(id.getMostSignificantBits());
             dos.writeLong(id.getLeastSignificantBits());
+
+            dos.writeLong(playerId.getMostSignificantBits());
+            dos.writeLong(playerId.getLeastSignificantBits());
+
             bytes = baos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,17 +111,19 @@ public class TankJoinMsg extends Message {
         }
     }
 
+    @Override
     public void parse(byte[] bytes) {
         DataInputStream buf;
         buf = new DataInputStream(new ByteArrayInputStream(bytes));
 
         try {
-            x = buf.readInt();
-            y = buf.readInt();
-            direction = Direction.values()[buf.readInt()];
-            moving = buf.readBoolean();
-            group = Group.values()[buf.readInt()];
-            id = new UUID(buf.readLong(), buf.readLong());
+            this.x = buf.readInt();
+            this.y = buf.readInt();
+            this.direction = Direction.values()[buf.readInt()];
+            this.group = Group.values()[buf.readInt()];
+            this.live = buf.readBoolean();
+            this.id = new UUID(buf.readLong(), buf.readLong());
+            this.playerId = new UUID(buf.readLong(), buf.readLong());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -126,18 +135,23 @@ public class TankJoinMsg extends Message {
         }
     }
 
+    @Override
     public void handle() {
-        if (GameModel.INSTANCE.findObjectById(this.id) != null) return;
+        Bullet bullet = (Bullet) GameModel.INSTANCE.findObjectById(this.id);
+        if (bullet == null) {
+            bullet = new Bullet(this.playerId, this.x, this.y, this.direction, this.group);
+            bullet.setLive(this.isLive());
 
-        System.out.println("other tank join..");
-
-        GameModel.INSTANCE.add(new NPCTank(this.id, x, y, this.direction));
-
-        Client.INSTANCE.send(new TankJoinMsg(GameModel.INSTANCE.getMyTank()));
+            GameModel.INSTANCE.add(bullet);
+        } else {
+            bullet.setX(this.x);
+            bullet.setY(this.y);
+            bullet.setLive(this.isLive());
+        }
     }
 
     @Override
     public MsgType getType() {
-        return MsgType.TankJoin;
+        return MsgType.Bullet;
     }
 }

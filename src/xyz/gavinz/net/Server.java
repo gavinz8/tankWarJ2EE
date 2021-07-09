@@ -19,11 +19,10 @@ import java.util.List;
  */
 public class Server {
     public static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    private List<TankJoinMsg> tankMessages = new ArrayList<>();
 
     public void connect() {
-        EventLoopGroup mainGroup = new NioEventLoopGroup(4);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+        EventLoopGroup mainGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(2);
 
         try {
             ServerBootstrap server = new ServerBootstrap();
@@ -50,14 +49,14 @@ public class Server {
         }
     }
 
-    class MyChannelInboundHandlerAdapter extends SimpleChannelInboundHandler<TankJoinMsg> {
+    class MyChannelInboundHandlerAdapter extends SimpleChannelInboundHandler<Message> {
         @Override
         public void channelActive(ChannelHandlerContext ctx) {
             clients.add(ctx.channel());
         }
 
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, TankJoinMsg msg) {
+        protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
             ServerFrame.INSTANCE.updateServerMsg(msg.toString());
 
             for (Channel client : clients) {
@@ -71,6 +70,7 @@ public class Server {
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             cause.printStackTrace();
             clients.remove(ctx.channel());
+            ctx.close();
         }
     }
 }

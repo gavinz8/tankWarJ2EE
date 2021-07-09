@@ -1,6 +1,7 @@
 package xyz.gavinz.net;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -9,11 +10,14 @@ import io.netty.handler.codec.MessageToByteEncoder;
  *
  * @author Gavin.Zhao
  */
-public class MsgEncoder extends MessageToByteEncoder<TankJoinMsg> {
+public class MsgEncoder extends MessageToByteEncoder<Message> {
     @Override
-    protected void encode(ChannelHandlerContext ctx, TankJoinMsg msg, ByteBuf out) {
+    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) {
         byte[] bytes = msg.toBytes();
+
+        out.writeInt(msg.getType().ordinal());
         out.writeInt(bytes.length);
+
         out.writeBytes(bytes);
     }
 }
