@@ -17,20 +17,14 @@ import java.util.List;
  * @author Gavin.Zhao
  */
 public class TankFrame extends Frame {
-    public static final Integer WINDOW_WIDTH;
-    public static final Integer WINDOW_HEIGHT;
-
-    static {
-        WINDOW_WIDTH = PropertyMgr.getInteger("windowWidth");
-        WINDOW_HEIGHT = PropertyMgr.getInteger("windowHeight");
-    }
+    public static final Integer WINDOW_WIDTH = PropertyMgr.getInteger("windowWidth");
+    public static final Integer WINDOW_HEIGHT = PropertyMgr.getInteger("windowHeight");
 
     public static final TankFrame INSTANCE = new TankFrame();
 
-    private Player myTank;
+    private GameModel gm = GameModel.INSTANCE;
+
     private Image offScreenImage;
-    private List<AbstractGameObject> objects;
-    private List<Collider> colliders;
 
     private TankFrame() {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -38,8 +32,6 @@ public class TankFrame extends Frame {
         setResizable(false);
         setTitle("tank war");
         setVisible(true);
-
-        this.initObjects();
 
         addKeyListener(new MyKeyListener());
 
@@ -51,68 +43,10 @@ public class TankFrame extends Frame {
         });
     }
 
-    private void initObjects() {
-        myTank = new Player(200, 200, Direction.DOWN);
-        this.colliders = new ArrayList<>();
-        this.colliders.add(new BulletTankCollider());
-        this.colliders.add(new BulletWallCollider());
-
-        this.objects = new ArrayList<>();
-        objects.add(new Wall(20, 50, 200, 30));
-        for (int i = 0; i < PropertyMgr.getInteger("initTankCount"); i++) {
-            objects.add(new NPCTank(50 + 50 * i, 50, Direction.DOWN));
-        }
-    }
-
     @Override
     public void paint(Graphics g) {
-        myTank.paint(g);
-
-
-        // 碰撞检测
-        for (int i = 0; i < objects.size(); i++) {
-            for (int j = 0; j < objects.size(); j++) {
-                for (Collider collider : colliders) {
-                    collider.collide(objects.get(i), objects.get(j));
-                }
-            }
-
-
-            if (objects.get(i).isLive()) {
-                objects.get(i).paint(g);
-            } else {
-                objects.remove(i);
-            }
-        }
-
-        /*
-        for (int i = 0; i < tanks.size(); i++) {
-            if (tanks.get(i).isLive()) {
-                tanks.get(i).paint(g);
-            } else {
-                tanks.remove(i);
-            }
-        }
-
-        for (int i = 0; i < bullets.size(); i++) {
-            for (int j = 0; j < tanks.size(); j++) {
-                bullets.get(i).collidesWithTank(tanks.get(j));
-            }
-
-            if (!bullets.get(i).isLive()) {
-                bullets.remove(i);
-            } else {
-                bullets.get(i).paint(g);
-            }
-        }
-
-        for (int i = 0; i < this.explodes.size(); i++) {
-            this.explodes.get(i).paint(g);
-        }
-
-         */
+        gm.paint(g);
     }
-
 
     @Override
     public void update(Graphics g) {
@@ -130,20 +64,19 @@ public class TankFrame extends Frame {
     }
 
     public void add(AbstractGameObject object) {
-        this.objects.add(object);
+        gm.add(object);
     }
 
     class MyKeyListener extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
-
-            myTank.keyPressed(e);
+            gm.keyPressed(e);
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
-            myTank.keyReleased(e);
+            gm.keyReleased(e);
         }
     }
 }

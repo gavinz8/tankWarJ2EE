@@ -1,9 +1,11 @@
 package xyz.gavinz;
 
+import xyz.gavinz.net.TankJoinMsg;
 import xyz.gavinz.strategy.FireStrategy;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.UUID;
 
 /**
  * @author Gavin.Zhao
@@ -16,12 +18,23 @@ public class Player extends AbstractGameObject {
     private Group group = Group.GOOD;
     private FireStrategy fireStrategy;
 
+    private UUID id = UUID.randomUUID();
+
     public Player(int x, int y, Direction direction) {
         this.x = x;
         this.y = y;
         this.direction = direction;
 
         this.initFireStrategy();
+    }
+
+    public Player(TankJoinMsg msg) {
+        this.x = msg.getX();
+        this.y = msg.getY();
+         this.direction = msg.getDirection();
+         this.moving = msg.isMoving();
+         this.group = msg.getGroup();
+         this.id = msg.getId();
     }
 
     public Group getGroup() {
@@ -44,6 +57,14 @@ public class Player extends AbstractGameObject {
         return direction;
     }
 
+    public boolean isMoving() {
+        return moving;
+    }
+
+    public void setMoving(boolean moving) {
+        this.moving = moving;
+    }
+
     public void setY(int y) {
         this.y = y;
     }
@@ -54,6 +75,11 @@ public class Player extends AbstractGameObject {
 
     public void paint(Graphics g) {
         if (!this.isLive()) return;
+
+        Color c = g.getColor();
+        g.setColor(Color.yellow);
+        g.drawString(id.toString(), x, y - 10);
+        g.setColor(c);
 
         switch (direction) {
             case UP:
@@ -168,4 +194,7 @@ public class Player extends AbstractGameObject {
 
     }
 
+    public UUID getId() {
+        return this.id;
+    }
 }
