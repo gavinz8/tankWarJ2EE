@@ -26,7 +26,7 @@ public class TankMovingMsgTest {
 
         ch.writeOutbound(msg);
 
-        ByteBuf buf = ch.readOutbound();
+        ByteBuf buf = (ByteBuf) ch.readOutbound();
         MsgType type = MsgType.values()[buf.readInt()];
         int len = buf.readInt();
         int x = buf.readInt();
@@ -59,7 +59,7 @@ public class TankMovingMsgTest {
         buf.writeBytes(msgData);
         ch.writeInbound(buf);
 
-        TankMovingMsg msg2 = ch.readInbound();
+        TankMovingMsg msg2 = (TankMovingMsg) ch.readInbound();
 
         assertEquals(MsgType.TankMoving, msg2.getType());
         assertEquals(msg.getX(), msg2.getX());

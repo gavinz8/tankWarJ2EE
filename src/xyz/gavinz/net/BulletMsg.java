@@ -88,7 +88,7 @@ public class BulletMsg extends Message {
             dos.writeInt(x);
             dos.writeInt(y);
             dos.writeInt(direction.ordinal());
-            dos.writeInt(group.ordinal());
+            dos.writeInt(Group.BAD.ordinal());
             dos.writeBoolean(live);
 
             dos.writeLong(id.getMostSignificantBits());
@@ -106,9 +106,9 @@ public class BulletMsg extends Message {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            return bytes;
         }
+
+        return bytes;
     }
 
     @Override
@@ -140,7 +140,8 @@ public class BulletMsg extends Message {
         Bullet bullet = (Bullet) GameModel.INSTANCE.findObjectById(this.id);
         if (bullet == null) {
             bullet = new Bullet(this.playerId, this.x, this.y, this.direction, this.group);
-            bullet.setLive(this.isLive());
+            bullet.setLive(this.live);
+            bullet.setId(this.id);
 
             GameModel.INSTANCE.add(bullet);
         } else {

@@ -1,5 +1,8 @@
 package xyz.gavinz;
 
+import xyz.gavinz.net.Client;
+import xyz.gavinz.net.TankMovingMsg;
+
 import java.awt.*;
 import java.util.Random;
 import java.util.UUID;

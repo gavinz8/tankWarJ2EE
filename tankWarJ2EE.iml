@@ -34,5 +34,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="io.netty:netty-all:4.0.54.Final" level="project" />
   </component>
 </module>

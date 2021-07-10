@@ -32,7 +32,7 @@ public class TankJoinMsgTest {
 
         ch.writeOutbound(msg);
 
-        ByteBuf buf = ch.readOutbound();
+        ByteBuf buf = (ByteBuf) ch.readOutbound();
         MsgType type = MsgType.values()[buf.readInt()];
         int len = buf.readInt();
         int x = buf.readInt();
@@ -68,7 +68,7 @@ public class TankJoinMsgTest {
         buf.writeBytes(msgData);
         ch.writeInbound(buf);
 
-        TankJoinMsg msg2 = ch.readInbound();
+        TankJoinMsg msg2 = (TankJoinMsg) ch.readInbound();
 
         assertEquals(MsgType.TankJoin, msg2.getType());
         assertEquals(msg.getX(), msg2.getX());

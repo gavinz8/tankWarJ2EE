@@ -29,7 +29,7 @@ public class CodecTest {
 
         ch.writeInbound(buf);
 
-        TankMessage message = ch.readInbound();
+        TankMessage message = (TankMessage) ch.readInbound();
 
         Assertions.assertEquals(message.getX(), oX);
         Assertions.assertEquals(message.getY(), oY);
@@ -45,7 +45,7 @@ public class CodecTest {
 
         ch.writeOutbound(new TankMessage(oX, oY));
 
-        ByteBuf buf = ch.readOutbound();
+        ByteBuf buf = (ByteBuf) ch.readOutbound();
         int x = buf.readInt();
         int y = buf.readInt();
 

@@ -6,5 +6,5 @@ package xyz.gavinz.net;
  * @author Gavin.Zhao
  */
 public enum MsgType {
-    TankJoin, TankMoving, Bullet
+    TankJoin, TankMoving, Bullet, TankDie
 }

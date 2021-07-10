@@ -30,7 +30,7 @@ public class BulletMsgTest {
 
         ch.writeOutbound(msg);
 
-        ByteBuf buf = ch.readOutbound();
+        ByteBuf buf = (ByteBuf) ch.readOutbound();
         MsgType type = MsgType.values()[buf.readInt()];
         int len = buf.readInt();
         int x = buf.readInt();
@@ -70,7 +70,7 @@ public class BulletMsgTest {
         buf.writeBytes(msgData);
         ch.writeInbound(buf);
 
-        BulletMsg msg2 = ch.readInbound();
+        BulletMsg msg2 = (BulletMsg) ch.readInbound();
 
         assertEquals(msg.getX(), msg2.getX());
         assertEquals(msg.getY(), msg2.getY());

@@ -26,6 +26,10 @@ public class Player extends AbstractGameObject {
         this.x = x;
         this.y = y;
         this.direction = direction;
+        width = ResourceMgr.goodTankU.getWidth();
+        height = ResourceMgr.goodTankU.getHeight();
+
+        this.rectangle = new Rectangle(x, y, width, height);
 
         this.initFireStrategy();
     }
@@ -150,6 +154,9 @@ public class Player extends AbstractGameObject {
             default:
                 break;
         }
+
+        rectangle.x = x;
+        rectangle.y = y;
 
         Client.INSTANCE.send(new TankMovingMsg(this.id, x, y, direction, true));
     }

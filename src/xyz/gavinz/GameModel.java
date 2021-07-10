@@ -37,7 +37,7 @@ public class GameModel {
         this.objects = new ArrayList<>();
         objects.add(new Wall(20, 50, 200, 30));
         for (int i = 0; i < PropertyMgr.getInteger("initTankCount"); i++) {
-            objects.add(new NPCTank(UUID.randomUUID(),50 + 50 * i, 50, Direction.DOWN));
+            objects.add(new NPCTank(UUID.randomUUID(), 50 + 50 * i, 50, Direction.DOWN));
         }
     }
 
@@ -47,6 +47,14 @@ public class GameModel {
 
     public void paint(Graphics g) {
         myTank.paint(g);
+
+        for (int i = 0; i < objects.size(); i++) {
+            AbstractGameObject object = objects.get(i);
+            if (!object.isLive()) {
+                objects.remove(object);
+                break;
+            }
+        }
 
         // 碰撞检测
         for (int i = 0; i < objects.size(); i++) {
@@ -58,8 +66,6 @@ public class GameModel {
 
             if (objects.get(i).isLive()) {
                 objects.get(i).paint(g);
-            } else {
-                objects.remove(i);
             }
         }
     }
@@ -78,10 +84,8 @@ public class GameModel {
 
 
     public AbstractGameObject findObjectById(UUID id) {
-        synchronized (objects) {
-            for (AbstractGameObject object : objects) {
-                if (object.getId().equals(id)) return object;
-            }
+        for (AbstractGameObject object : objects) {
+            if (object.getId().equals(id)) return object;
         }
 
         return null;

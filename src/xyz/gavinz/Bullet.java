@@ -105,7 +105,5 @@ public class Bullet extends AbstractGameObject {
         if (x < 0 || y < 30 || x > TankFrame.WINDOW_WIDTH || y > TankFrame.WINDOW_HEIGHT) {
             live = false;
         }
-
-        Client.INSTANCE.send(new BulletMsg(this));
     }
 }

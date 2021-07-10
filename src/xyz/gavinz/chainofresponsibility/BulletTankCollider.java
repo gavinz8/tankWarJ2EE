@@ -1,6 +1,9 @@
 package xyz.gavinz.chainofresponsibility;
 
 import xyz.gavinz.*;
+import xyz.gavinz.net.Client;
+import xyz.gavinz.net.TankDieMsg;
+import xyz.gavinz.net.TankMovingMsg;
 
 import java.awt.*;
 
@@ -21,6 +24,9 @@ public class BulletTankCollider implements Collider {
             if (bRect.intersects(tRect) && tank.isLive()) {
                 bullet.die();
                 tank.die();
+
+                Client.INSTANCE.send(new TankDieMsg(tank.getId(), bullet.getId()));
+
                 Rectangle rectangle = o2.getRectangle();
                 TankFrame.INSTANCE.add(new Explode(rectangle.x + tank.getWidth() / 2 - Explode.WIDTH / 2, rectangle.y + tank.getHeight() / 2 - Explode.HEIGHT / 2));
             }
